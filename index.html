@@ -21,67 +21,61 @@
             overflow: hidden; display: flex; flex-direction: column; height: 100vh;
         }
 
-        /* סרט פילם - שיפור אנימציה */
+        /* סרט פילם */
         .film-strip {
-            width: 100%; background: #000; padding: 25px 0;
-            border-top: 1px solid rgba(212, 175, 55, 0.2);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            width: 100%; background: #000; padding: 35px 0;
+            border-top: 2px solid rgba(212, 175, 55, 0.3);
+            border-bottom: 2px solid rgba(212, 175, 55, 0.3);
             position: relative; z-index: 5; overflow: hidden;
-            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
         
+        /* עיגולי פילם (חורים) */
+        .film-strip::before, .film-strip::after {
+            content: ""; position: absolute; left: 0; width: 100%; height: 15px;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.4) 30%, transparent 40%);
+            background-size: 30px 100%; 
+            filter: blur(2px); /* הטשטוש שביקשת */
+            z-index: 10;
+        }
+        .film-strip::before { top: 10px; } 
+        .film-strip::after { bottom: 10px; }
+
         .film-track { 
             display: flex; 
             width: max-content; 
-            animation: slide 40s linear infinite;
+            animation: slideRight 40s linear infinite; /* תנועה ימינה */
             will-change: transform;
         }
         
-        .frame { width: 240px; height: 160px; margin: 0 10px; flex-shrink: 0; border-radius: 4px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.1); }
+        .frame { width: 260px; height: 180px; margin: 0 10px; flex-shrink: 0; border-radius: 2px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2); }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* לופ אינסופי חלק */
-        @keyframes slide {
-            from { transform: translateX(0); }
-            to { transform: translateX(calc(-50%)); }
+        /* אנימציה משמאל לימין */
+        @keyframes slideRight {
+            from { transform: translateX(-50%); }
+            to { transform: translateX(0); }
         }
 
-        /* הזזת המלל למעלה */
-        .main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; transform: translateY(-30px); }
+        .main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; transform: translateY(-20px); }
         
-        .hebrew-date { font-size: clamp(2.5rem, 10vw, 5rem); color: var(--gold); margin: 0; font-weight: 700; text-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
+        .hebrew-date { font-size: clamp(2.8rem, 12vw, 5.5rem); color: var(--gold); margin: 0; font-weight: 700; text-shadow: 0 0 25px rgba(212, 175, 55, 0.3); }
         
-        /* עיצוב לועזי משודרג */
         .english-date { 
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem; 
+            font-size: 2rem; 
             color: var(--gold); 
-            margin-top: 5px; 
-            letter-spacing: 1px;
-            opacity: 0.9;
+            margin-top: 10px; 
+            letter-spacing: 2px;
         }
 
-        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 25px 0; }
+        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 35px 0; }
         .unit { 
-            text-align: center; min-width: 75px; padding: 12px 5px; 
+            text-align: center; min-width: 80px; padding: 15px 5px; 
             background: var(--glass); border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.15); 
             backdrop-filter: blur(10px);
         }
-        .unit .val { font-size: 2.2rem; font-weight: 700; display: block; line-height: 1; }
-        .unit .lbl { font-size: 0.75rem; color: var(--gold); font-weight: bold; }
-
-        /* פס התקדמות */
-        .progress-container {
-            width: 80%; max-width: 500px; margin-top: 20px; text-align: center;
-        }
-        .progress-bar-bg {
-            width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden;
-        }
-        .progress-bar-fill {
-            height: 100%; background: linear-gradient(90deg, transparent, var(--gold)); width: 0%; transition: width 1s ease-out;
-        }
-        .progress-text { font-size: 0.9rem; color: var(--gold); font-weight: bold; }
+        .unit .val { font-size: 2.5rem; font-weight: 700; display: block; line-height: 1; color: white; }
+        .unit .lbl { font-size: 0.85rem; color: var(--gold); font-weight: bold; margin-top: 5px; display: block; }
 
         #stars-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
         .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--d) infinite; }
@@ -106,7 +100,7 @@
         <div class="film-strip"><div class="film-track" id="track"></div></div>
 
         <div class="main">
-            <div id="greeting-text" style="color:var(--gold); font-size: 1.3rem; margin-bottom: 10px; font-weight: bold;"></div>
+            <div id="greeting-text" style="color:var(--gold); font-size: 1.4rem; margin-bottom: 10px; font-weight: bold; opacity: 0.8;"></div>
             <h1 id="hebrew-date-display" class="hebrew-date">טוען...</h1>
             <div id="english-date-display" class="english-date"></div>
             
@@ -116,13 +110,6 @@
                 <div class="unit"><span class="val" id="h-val">0</span><span class="lbl">שעות</span></div>
                 <div class="unit"><span class="val" id="min-val">0</span><span class="lbl">דקות</span></div>
                 <div class="unit"><span class="val" id="sec-val">0</span><span class="lbl">שניות</span></div>
-            </div>
-
-            <div class="progress-container">
-                <div class="progress-text" id="progress-desc">מחשב התקדמות...</div>
-                <div class="progress-bar-bg">
-                    <div id="progress-fill" class="progress-bar-fill"></div>
-                </div>
             </div>
         </div>
     </div>
@@ -155,7 +142,6 @@
             } else { alert("קוד שגוי"); }
         }
 
-        // פונקציה לניקוי ניקוד
         function removeNikud(text) {
             return text.replace(/[\u0591-\u05C7]/g, "");
         }
@@ -181,15 +167,15 @@
             document.getElementById('hebrew-date-display').innerText = hebDate;
             document.getElementById('english-date-display').innerText = data.date.split('-').reverse().join(' . ');
 
-            // לופ תמונות אינסופי וחלק
             const track = document.getElementById('track');
             let imgs = data.images || [];
-            if(imgs.length === 0) imgs = ['https://via.placeholder.com/240x160/111/d4af37?text=No+Images'];
+            if(imgs.length === 0) imgs = ['https://via.placeholder.com/260x180/111/d4af37?text=Image'];
             
-            // הכפלת התמונות ליצירת רצף
+            // יצירת רצף תמונות ארוך מאוד ללופ אינסופי ללא קפיצות
             const buildTrack = () => {
-                const combinedImgs = [...imgs, ...imgs, ...imgs, ...imgs]; // מבטיח מספיק תוכן ללופ
-                track.innerHTML = combinedImgs.map(url => `<div class="frame"><img src="${url}"></div>`).join('');
+                // משכפל את המערך כמה פעמים כדי למלא את הרוחב ולמנוע "סוף" לתנועה
+                const repeatedImgs = [...imgs, ...imgs, ...imgs, ...imgs, ...imgs, ...imgs];
+                track.innerHTML = repeatedImgs.map(url => `<div class="frame"><img src="${url}"></div>`).join('');
             };
             buildTrack();
 
@@ -199,14 +185,9 @@
 
         function startCounter(dateStr) {
             const target = new Date(dateStr + "T19:30:00").getTime();
-            
-            // לצורך פס ההתקדמות - נניח שהספירה החלה חצי שנה לפני (או תאריך יצירה אם היה לנו)
-            const startDate = new Date(new Date(dateStr).getTime() - (180 * 24 * 60 * 60 * 1000)).getTime();
-
             setInterval(() => {
                 const now = new Date().getTime();
                 const diff = target - now;
-                
                 if (diff > 0) {
                     const days = Math.floor(diff / 86400000);
                     document.getElementById('m-val').innerText = Math.floor(days / 30.44);
@@ -214,16 +195,6 @@
                     document.getElementById('h-val').innerText = Math.floor((diff % 86400000) / 3600000);
                     document.getElementById('min-val').innerText = Math.floor((diff % 3600000) / 60000);
                     document.getElementById('sec-val').innerText = Math.floor((diff % 60000) / 1000);
-
-                    // חישוב פס התקדמות
-                    const totalDuration = target - startDate;
-                    const elapsed = now - startDate;
-                    const progress = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
-                    document.getElementById('progress-fill').style.width = progress + "%";
-                    document.getElementById('progress-desc').innerText = `עברנו כבר ${progress.toFixed(1)}% מהדרך לחתונה!`;
-                } else {
-                    document.getElementById('progress-desc').innerText = "היום הגדול הגיע!";
-                    document.getElementById('progress-fill').style.width = "100%";
                 }
             }, 1000);
         }
