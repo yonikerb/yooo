@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <link rel="icon" type="image/png" href="logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>החתונה שלנו</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-classic.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-classic.js"></script>
+
+    <style>
+        :root { --gold: #d4af37; --bg: #050505; --glass: rgba(255, 255, 255, 0.05); }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Assistant', sans-serif;
+            margin: 0; padding: 0; background-color: var(--bg); color: white;
+            overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        /* מסך כניסה */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 4000; display: flex; 
+            flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+        }
+        #login-screen input {
+            width: 100%; max-width: 300px; padding: 15px; margin: 10px 0;
+            border-radius: 10px; border: 1px solid var(--gold);
+            background: rgba(255,255,255,0.05); color: white; text-align: center; font-size: 1.1rem;
+        }
+        #login-screen button {
+            width: 100%; max-width: 300px; padding: 15px; border-radius: 30px;
+            border: none; background: var(--gold); color: black; font-weight: bold; cursor: pointer;
+            font-size: 1.1rem; transition: 0.3s;
+        }
+
+        /* כפתור העלאה צף */
+        #floating-upload {
+            position: fixed; bottom: 30px; left: 30px; width: 65px; height: 65px;
+            background: var(--gold); border-radius: 50%; border: none; font-size: 35px;
+            cursor: pointer; z-index: 1000; box-shadow: 0 0 20px rgba(212,175,55,0.4);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* גלריה (Film Strip) */
+        .film-strip { width: 100%; overflow: hidden; background: #000; padding: 20px 0; border-bottom: 1px solid rgba(212, 175, 55, 0.3); }
+        .film-track { display: flex; width: max-content; animation: slide 60s linear infinite; }
+        .frame { width: 220px; height: 150px; margin: 0 12px; flex-shrink: 0; border-radius: 8px; overflow: hidden; }
+        .frame img { width: 100%; height: 100%; object-fit: cover; }
+        @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        .main { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 40px 20px; }
+        .hebrew-title { font-size: clamp(2.5rem, 10vw, 5rem); color: var(--gold); margin: 10px 0; font-weight: 700; }
+        
+        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 30px 0; }
+        .unit { min-width: 75px; padding: 15px; background: var(--glass); border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.1); }
+        .unit .val { font-size: 2rem; font-weight: 700; display: block; }
+        .unit .lbl { font-size: 0.8rem; color: var(--gold); }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h1 style="color:var(--gold); font-family:'Playfair Display', serif;">Welcome</h1>
+        <input type="text" id="login-code-input" placeholder="הכניסו קוד כניסה">
+        <button onclick="checkLoginCode()">כניסה</button>
+    </div>
+
+    <div id="site-content" style="display:none;">
+        <div class="film-strip"><div class="film-track" id="track"></div></div>
+        
+        <div class="main">
+            <h1 id="display-names" class="hebrew-title">טוען...</h1>
+            <div id="display-date" style="font-size: 1.4rem; color: rgba(212,175,55,0.7);"></div>
+            
+            <div class="counter-grid">
+                <div class="unit"><span class="val" id="d-val">0</span><span class="lbl">ימים</span></div>
+                <div class="unit"><span class="val" id="h-val">0</span><span class="lbl">שעות</span></div>
+                <div class="unit"><span class="val" id="min-val">0</span><span class="lbl">דקות</span></div>
+                <div class="unit"><span class="val" id="sec-val">0</span><span class="lbl">שניות</span></div>
+            </div>
+        </div>
+
+        <button id="floating-upload" onclick="document.getElementById('file-input').click()">+</button>
+        <input type="file" id="file-input" style="display:none;" accept="image/*" onchange="handleFileUpload(this.files[0])">
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIhLeaQnJ1HMxnEL0S4CLfMNyY7cfEfeA",
+            authDomain: "chatunot-b63ec.firebaseapp.com",
+            projectId: "chatunot-b63ec",
+            storageBucket: "chatunot-b63ec.firebasestorage.app",
+            messagingSenderId: "1057494918141",
+            appId: "1:1057494918141:web:6d03f8007c894e463a6f94"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const IMGBB_KEY = "f72aea59829f2a6501c518e83e94fe81";
+        let currentCode = localStorage.getItem('weddingCode');
+
+        window.onload = () => {
+            if (currentCode) {
+                loadWeddingData(currentCode);
+            }
+        };
+
+        async function checkLoginCode() {
+            const code = document.getElementById('login-code-input').value.trim().toUpperCase();
+            if(!code) return alert("נא להזין קוד");
+            
+            const doc = await db.collection("weddings").doc(code).get();
+            if (doc.exists) {
+                localStorage.setItem('weddingCode', code);
+                currentCode = code;
+                loadWeddingData(code);
+            } else {
+                alert("קוד לא נמצא");
+            }
+        }
+
+        async function loadWeddingData(code) {
+            const doc = await db.collection("weddings").doc(code).get();
+            const data = doc.data();
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('site-content').style.display = 'block';
+            document.getElementById('display-names').innerText = `${data.groom} & ${data.bride}`;
+            document.getElementById('display-date').innerText = new Date(data.date).toLocaleDateString('he-IL');
+
+            const track = document.getElementById('track');
+            track.innerHTML = '';
+            if(data.images && data.images.length > 0) {
+                data.images.forEach(url => {
+                    const frame = document.createElement('div');
+                    frame.className = 'frame';
+                    frame.innerHTML = `<img src="${url}">`;
+                    track.appendChild(frame);
+                });
+                if(data.images.length > 2) track.innerHTML += track.innerHTML;
+            }
+
+            startCountdown(data.date);
+        }
+
+        async function handleFileUpload(file) {
+            if(!file || !currentCode) return;
+            const btn = document.getElementById('floating-upload');
+            btn.innerText = "⏳";
+            
+            const formData = new FormData();
+            formData.append("image", file);
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+                    method: "POST", body: formData
+                });
+                const result = await res.json();
+                const url = result.data.url;
+
+                await db.collection("weddings").doc(currentCode).update({
+                    images: firebase.firestore.FieldValue.arrayUnion(url)
+                });
+
+                location.reload();
+            } catch (e) {
+                alert("שגיאה בהעלאה");
+                btn.innerText = "+";
+            }
+        }
+
+        function startCountdown(dateStr) {
+            const target = new Date(dateStr + "T19:30:00").getTime();
+            setInterval(() => {
+                const now = new Date().getTime();
+                const diff = target - now;
+                if(diff > 0) {
+                    document.getElementById('d-val').innerText = Math.floor(diff / 86400000);
+                    document.getElementById('h-val').innerText = Math.floor((diff % 86400000) / 3600000);
+                    document.getElementById('min-val').innerText = Math.floor((diff % 3600000) / 60000);
+                    document.getElementById('sec-val').innerText = Math.floor((diff % 60000) / 1000);
+                } else {
+                    document.querySelector('.counter-grid').innerHTML = "<h3>מזל טוב! היום זה היום!</h3>";
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
