@@ -24,13 +24,13 @@
         <input type="text" id="groom" placeholder="שם החתן">
         <input type="text" id="bride" placeholder="שם הכלה">
         <input type="date" id="date">
-        <input type="text" id="custom-code" placeholder="קוד כניסה (למשל: 053249)">
+        <input type="text" id="custom-code" placeholder="קוד כניסה (למשל: 0532490351)">
         <button id="submit-btn" onclick="createNewWedding()">צור חתונה וקוד</button>
         <div id="status" class="status-msg"></div>
     </div>
 
     <script>
-        // 2. הגדרות הפרויקט שלך
+        // 2. הגדרות הפרויקט שלך (Firebase Config)
         const firebaseConfig = {
             apiKey: "AIzaSyBIhLeaQnJ1HMxnEL0S4CLfMNyY7cfEfeA",
             authDomain: "chatunot-b63ec.firebaseapp.com",
@@ -40,11 +40,11 @@
             appId: "1:1057494918141:web:6d03f8007c894e463a6f94"
         };
 
-        // 3. אתחול Firebase והגדרת המשתנה db מיד בטעינה
+        // 3. אתחול Firebase והגדרת המשתנה db
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 4. הפונקציה ליצירת החתונה
+        // 4. הפונקציה ליצירת החתונה במסד הנתונים
         async function createNewWedding() {
             const groom = document.getElementById('groom').value;
             const bride = document.getElementById('bride').value;
@@ -63,23 +63,23 @@
             status.innerText = "";
 
             try {
-                // הוספת הזוג למסד הנתונים - כאן db כבר מאותחל בוודאות
+                // הוספת הזוג לאוסף ה-weddings ב-Firestore
                 await db.collection("weddings").doc(code).set({
                     groom: groom,
                     bride: bride,
                     date: date,
-                    images: [] 
+                    images: [] // מתחילים עם גלריה ריקה
                 });
                 
                 status.style.color = "#2ecc71";
-                status.innerText = "הצלחה! הקוד נוצר: " + code;
+                status.innerText = "הצלחה! הקוד " + code + " נוצר עבור " + groom + " ו" + bride;
                 
-                // איפוס שדות
+                // איפוס טופס
                 document.getElementById('groom').value = "";
                 document.getElementById('bride').value = "";
                 document.getElementById('custom-code').value = "";
             } catch (error) {
-                console.error("Error:", error);
+                console.error("Error writing document: ", error);
                 status.style.color = "#e74c3c";
                 status.innerText = "שגיאה: " + error.message;
             } finally {
