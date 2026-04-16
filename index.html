@@ -21,33 +21,35 @@
             overflow: hidden; display: flex; flex-direction: column; height: 100vh;
         }
 
-        /* סרט פילם משופר עם לופ אינסופי */
+        /* סרט פילם אותנטי עם לופ אינסופי אמיתי */
         .film-strip {
             width: 100%; background: #000; padding: 25px 0;
             border-top: 1px solid rgba(212, 175, 55, 0.2);
             border-bottom: 1px solid rgba(212, 175, 55, 0.2);
             position: relative; z-index: 5; overflow: hidden;
+            /* אפקט עמעום בצדדים */
             mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
             -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
         
-        /* נקודות פילם */
+        /* נקודות הפילם (מטושטשות) */
         .film-strip::before, .film-strip::after {
             content: ""; position: absolute; left: 0; width: 100%; height: 12px;
             background-image: radial-gradient(circle, rgba(255,255,255,0.4) 30%, transparent 70%);
             background-size: 25px 100%; filter: blur(1.5px); z-index: 10;
         }
-        .film-strip::before { top: 6px; } .film-strip::after { bottom: 6px; }
+        .film-strip::before { top: 6px; } 
+        .film-strip::after { bottom: 6px; }
 
         .film-track { 
             display: flex; 
             width: max-content; 
-            animation: slide 60s linear infinite; /* מהירות תנועה */
+            animation: slide 60s linear infinite; /* מהירות האנימציה */
             will-change: transform;
         }
         
         .frame { 
-            width: 200px; 
+            width: 200px; /* גודל התמונה */
             height: 140px; 
             margin: 0 10px; 
             flex-shrink: 0; 
@@ -57,16 +59,17 @@
         }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* האנימציה שיוצרת את הלופ */
+        /* האנימציה שיוצרת את הלופ האינסופי */
         @keyframes slide {
             0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } /* זז בדיוק חצי מהרוחב הכולל המשוכפל */
+            100% { transform: translateX(-50%); } /* זז חצי מהרוחב הכולל, שנוצר ע"י השכפול */
         }
 
-        /* תוכן מרכזי */
+        /* תוכן מרכזי (מרכז המסך) */
         .main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; }
         .hebrew-title { font-size: clamp(3rem, 15vw, 6rem); color: var(--gold); margin: 0; font-weight: 700; text-shadow: 0 0 20px rgba(212, 175, 55, 0.2); }
         
+        /* מונה זמן מוגדל */
         .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 25px 0; }
         .unit { 
             text-align: center; min-width: 90px; padding: 20px 10px; 
@@ -76,19 +79,23 @@
         .unit .val { font-size: 2.8rem; font-weight: 700; display: block; line-height: 1; margin-bottom: 5px; }
         .unit .lbl { font-size: 0.8rem; color: var(--gold); font-weight: bold; }
 
+        /* מד התקדמות (כמה נשאר) */
         .progress-container { width: 80%; max-width: 400px; margin-top: 20px; text-align: center; }
         .progress-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
         .progress-bar { height: 100%; width: 0%; background: var(--gold); box-shadow: 0 0 15px var(--gold); transition: 0.5s; }
         .percent-text { font-size: 0.9rem; color: #888; letter-spacing: 1px; }
 
+        /* כפתור העלאה בצד שמאל למטה */
         .upload-section { position: fixed; bottom: 30px; left: 30px; z-index: 100; }
         .upload-btn {
             background: var(--bg); border: 1px solid var(--gold); color: var(--gold);
             width: 65px; height: 65px; border-radius: 50%; cursor: pointer;
             font-size: 2rem; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6); transition: 0.3s;
         }
+        .upload-btn:hover { background: var(--gold); color: black; transform: scale(1.1); }
 
+        /* שכבת כניסה */
         #login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); z-index: 5000; display: flex; flex-direction: column;
@@ -102,6 +109,9 @@
             padding: 12px 40px; background: var(--gold); border: none; border-radius: 30px;
             font-weight: bold; cursor: pointer; color: black;
         }
+
+        #stars-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; }
     </style>
 </head>
 <body>
@@ -111,6 +121,8 @@
         <input type="text" id="login-code" placeholder="הכניסו קוד">
         <button onclick="checkCode()">כניסה</button>
     </div>
+
+    <div id="stars-layer"></div>
 
     <div id="main-content" style="display:none; height: 100%; flex-direction: column;">
         <div class="film-strip">
@@ -131,7 +143,7 @@
 
             <div class="progress-container">
                 <div class="progress-bg"><div id="progress-bar" class="progress-bar"></div></div>
-                <div id="percent-text" class="percent-text">0% עברו</div>
+                <div id="percent-text" class="percent-text">0% נותרו</div>
             </div>
         </div>
 
@@ -143,7 +155,6 @@
     </div>
 
     <script>
-        // אתחול Firebase בתוך משתנים גלובליים כדי למנוע את שגיאת ה-initialization
         const firebaseConfig = {
             apiKey: "AIzaSyBIhLeaQnJ1HMxnEL0S4CLfMNyY7cfEfeA",
             authDomain: "chatunot-b63ec.firebaseapp.com",
@@ -152,7 +163,6 @@
             messagingSenderId: "1057494918141",
             appId: "1:1057494918141:web:6d03f8007c894e463a6f94"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const IMGBB_API_KEY = "f72aea59829f2a6501c518e83e94fe81";
@@ -160,18 +170,17 @@
         let currentCode = localStorage.getItem('weddingCode');
 
         window.onload = () => {
+            createStars();
             if (currentCode) loadWedding(currentCode);
         };
 
         async function checkCode() {
             const code = document.getElementById('login-code').value.trim().toUpperCase();
-            try {
-                const doc = await db.collection("weddings").doc(code).get();
-                if (doc.exists) {
-                    localStorage.setItem('weddingCode', code);
-                    location.reload();
-                } else { alert("קוד שגוי"); }
-            } catch(e) { alert("שגיאה בחיבור למסד הנתונים"); }
+            const doc = await db.collection("weddings").doc(code).get();
+            if (doc.exists) {
+                localStorage.setItem('weddingCode', code);
+                location.reload();
+            } else { alert("קוד שגוי"); }
         }
 
         async function loadWedding(code) {
@@ -185,23 +194,62 @@
 
             const track = document.getElementById('track');
             let imgs = data.images || [];
+            
+            // תמונת ברירת מחדל אם אין תמונות
             if(imgs.length === 0) imgs = ['https://via.placeholder.com/200x140/111/d4af37?text=No+Images'];
             
-            // יצירת הלופ האינסופי האמיתי:
-            // אנחנו משכפלים את המערך כל כך הרבה פעמים שהוא תמיד ימלא את המסך,
-            // ואז האנימציה זזה חצי דרך וחוזרת להתחלה בצורה חלקה.
-            const buildTrack = () => {
+            // המנגנון ליצירת לופ אינסופי אמיתי מדינמי
+            const buildInfiniteTrack = () => {
                 track.innerHTML = "";
-                // משכפלים את מערך התמונות כדי ליצור רצף ארוך מאוד
-                const repeatedImgs = [...imgs, ...imgs, ...imgs, ...imgs, ...imgs, ...imgs];
-                repeatedImgs.forEach(url => {
+                
+                // 1. מחשבים כמה תמונות נכנסות ברוחב המסך
+                const frameWidth = 220; // 200px תמונה + 10px מרג'ין מכל צד
+                const screenWidth = window.innerWidth;
+                const imagesNeededToFillScreen = Math.ceil(screenWidth / frameWidth);
+                
+                // 2. יוצרים מערך חדש שמשכפל את התמונות שלך מספיק פעמים כדי למלא את המסך לפחות פעמיים
+                // אנחנו משכפלים את מערך התמונות המקורי (imgs) בלופ עד שנגיע לכמות הנדרשת
+                let repeatedArray = [];
+                // אנחנו צריכים שהרוחב הכולל יהיה לפחות פעמיים רוחב המסך כדי שהאנימציה תעבוד
+                const targetCount = Math.max(imgs.length * 2, imagesNeededToFillScreen * 2); 
+                
+                for (let i = 0; i < targetCount; i++) {
+                    repeatedArray.push(imgs[i % imgs.length]); // משתמש ב-% כדי לחזור על 123123
+                }
+                
+                // 3. מזינים את ה-DOM
+                repeatedArray.forEach(url => {
                     track.innerHTML += `<div class="frame"><img src="${url}"></div>`;
                 });
             };
-            buildTrack();
+            
+            buildInfiniteTrack();
+            // מעדכנים אם המשתמש משנה את גודל המסך (למשל מסובב את הטלפון)
+            window.onresize = buildInfiniteTrack;
 
             startCounter(data.date);
             updateGreeting();
+        }
+
+        async function uploadToImgBB(input) {
+            if (!input.files[0]) return;
+            const status = document.getElementById('upload-status');
+            status.innerText = "מעלה רגע חדש...";
+            
+            const formData = new FormData();
+            formData.append("image", input.files[0]);
+
+            try {
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+                const json = await res.json();
+                if (json.success) {
+                    await db.collection("weddings").doc(currentCode).update({
+                        images: firebase.firestore.FieldValue.arrayUnion(json.data.url)
+                    });
+                    status.innerText = "נשמר בהצלחה!";
+                    setTimeout(() => location.reload(), 800);
+                }
+            } catch (e) { status.innerText = "שגיאת העלאה"; }
         }
 
         function startCounter(dateStr) {
@@ -227,22 +275,17 @@
             }, 1000);
         }
 
-        async function uploadToImgBB(input) {
-            if (!input.files[0]) return;
-            const status = document.getElementById('upload-status');
-            status.innerText = "מעלה...";
-            const formData = new FormData();
-            formData.append("image", input.files[0]);
-            try {
-                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
-                const json = await res.json();
-                if (json.success) {
-                    await db.collection("weddings").doc(currentCode).update({
-                        images: firebase.firestore.FieldValue.arrayUnion(json.data.url)
-                    });
-                    location.reload();
-                }
-            } catch (e) { status.innerText = "שגיאה"; }
+        function createStars() {
+            const container = document.getElementById('stars-layer');
+            for(let i=0; i<100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 'px';
+                star.style.width = star.style.height = size;
+                star.style.top = Math.random() * 100 + '%';
+                star.style.left = Math.random() * 100 + '%';
+                container.appendChild(star);
+            }
         }
 
         function updateGreeting() {
