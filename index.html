@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>חתונה</title>
+    <title>החתונה שלנו</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root { --gold: #d4af37; --bg: #050505; --glass: rgba(255, 255, 255, 0.05); }
@@ -26,85 +25,65 @@
             background: var(--bg); z-index: 5000; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
         }
-        #login-overlay input {
-            padding: 15px; border-radius: 10px; border: 1px solid var(--gold);
-            background: #111; color: white; margin: 10px; width: 250px; text-align: center;
-            font-size: 1rem;
-        }
-        #login-overlay button {
-            padding: 12px 30px; background: var(--gold); border: none; border-radius: 25px;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
-        }
-        #login-overlay button:hover { opacity: 0.8; transform: scale(1.05); }
+        #login-overlay input { padding: 15px; border-radius: 10px; border: 1px solid var(--gold); background: #111; color: white; margin: 10px; width: 250px; text-align: center; }
+        #login-overlay button { padding: 12px 30px; background: var(--gold); border: none; border-radius: 25px; font-weight: bold; cursor: pointer; }
 
-        /* תפריט צד */
-        #side-menu {
-            position: fixed; top: 0; right: -280px; width: 280px; height: 100%;
-            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px);
-            z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 1px solid var(--gold); padding: 40px 25px;
-        }
-        #side-menu.open { right: 0; }
-        #menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1999; }
-        .menu-link { display: block; color: white; text-decoration: none; font-size: 1.4rem; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.1); }
-
-        #stars-layer { position: fixed; top: -50px; left: -50px; width: calc(100% + 100px); height: calc(100% + 100px); z-index: 1; pointer-events: none; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: twinkle var(--duration) infinite ease-in-out; }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.2); }
-        }
-
+        /* סרט פילם */
         .film-strip {
-            width: 100%; background: #000; padding: 25px 0; border-top: 1px solid rgba(212, 175, 55, 0.3);
+            width: 100%; background: #000; padding: 20px 0; border-top: 1px solid rgba(212, 175, 55, 0.3);
             border-bottom: 1px solid rgba(212, 175, 55, 0.3); position: relative; z-index: 5; overflow: hidden;
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
-        .film-track { display: flex; width: max-content; animation: slide 60s linear infinite; }
-        .frame { width: 260px; height: 170px; margin: 0 10px; flex-shrink: 0; border-radius: 2px; overflow: hidden; }
+        .film-track { display: flex; width: max-content; animation: slide 40s linear infinite; }
+        .frame { width: 200px; height: 130px; margin: 0 10px; flex-shrink: 0; border-radius: 4px; overflow: hidden; border: 1px solid #222; }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
         @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         .main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; }
-        .hebrew-title { font-size: clamp(2.8rem, 12vw, 5.5rem); color: var(--gold); margin: 0; font-weight: 700; }
-        .english-sub { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: rgba(212, 175, 55, 0.6); margin-top: 5px; }
+        .hebrew-title { font-size: clamp(2.5rem, 10vw, 5rem); color: var(--gold); margin: 0; font-weight: 700; }
+        
+        /* טיימר */
+        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 25px 0; }
+        .unit { text-align: center; min-width: 70px; padding: 15px 5px; background: var(--glass); border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.1); }
+        .unit .val { font-size: 1.8rem; font-weight: 700; display: block; }
+        .unit .lbl { font-size: 0.65rem; color: var(--gold); }
 
-        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 35px 0; }
-        .unit { text-align: center; min-width: 85px; padding: 20px 10px; background: var(--glass); border-radius: 15px; border: 1px solid rgba(212, 175, 55, 0.1); }
-        .unit .val { font-size: 2.5rem; font-weight: 700; display: block; }
-        .unit .lbl { font-size: 0.7rem; color: var(--gold); }
+        .progress-container { width: 280px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background: var(--gold); transition: 0.5s; box-shadow: 0 0 10px var(--gold); }
 
-        .progress-container { width: 300px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 20px; overflow: hidden; }
-        #progress-bar { height: 100%; width: 0%; background: var(--gold); transition: 0.5s; }
+        /* אזור הוספת תמונה */
+        .admin-controls {
+            padding: 20px; background: rgba(20,20,20,0.8); border-top: 1px solid var(--gold);
+            width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .admin-controls input { padding: 10px; border-radius: 5px; border: 1px solid #444; background: #111; color: white; width: 80%; max-width: 400px; }
+        .admin-controls button { padding: 10px 20px; background: var(--gold); border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        #stars-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.5; }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
-        <h2 style="color:var(--gold)">ברוכים הבאים</h2>
-        <input type="text" id="login-code" placeholder="הכניסו קוד כניסה">
-        <button onclick="checkCode()">כניסה</button>
-    </div>
-
-    <div id="menu-overlay" onclick="closeNav()"></div>
-    <div id="side-menu">
-        <nav>
-            <a href="#" class="menu-link" onclick="closeNav()">דף הבית</a>
-            <a href="#" class="menu-link" onclick="logout()">החלף משתמש / יציאה</a>
-        </nav>
+        <h2 style="color:var(--gold)">קוד כניסה נדרש</h2>
+        <input type="text" id="login-code" placeholder="הכנס קוד (למשל: 084934)">
+        <button onclick="checkCode()">כניסה למערכת</button>
     </div>
 
     <div id="stars-layer"></div>
 
     <div id="main-content" style="display:none;">
-        <div class="film-strip"><div class="film-track" id="track"></div></div>
+        <div class="film-strip">
+            <div class="film-track" id="track"></div>
+        </div>
 
         <div class="main">
-            <div id="greeting-text" style="color:var(--gold); font-weight:bold; margin-bottom:10px;"></div>
             <h1 id="wedding-names" class="hebrew-title">טוען...</h1>
-            <div id="wedding-date-display" class="english-sub"></div>
+            <div id="wedding-date-display" style="color:rgba(212,175,55,0.7); letter-spacing: 2px;"></div>
             
             <div class="counter-grid">
+                <div class="unit"><span class="val" id="m-val">0</span><span class="lbl">חודשים</span></div>
                 <div class="unit"><span class="val" id="d-val">0</span><span class="lbl">ימים</span></div>
                 <div class="unit"><span class="val" id="h-val">0</span><span class="lbl">שעות</span></div>
                 <div class="unit"><span class="val" id="min-val">0</span><span class="lbl">דקות</span></div>
@@ -112,12 +91,21 @@
             </div>
 
             <div class="progress-container"><div id="progress-bar"></div></div>
-            <div id="percent-text" style="font-size: 0.8rem; color: #888; margin-top: 10px;"></div>
+            <div id="percent-text" style="font-size: 0.75rem; color: #888; margin-top: 8px;"></div>
+        </div>
+
+        <div class="admin-controls">
+            <span style="font-size: 0.8rem; color: var(--gold);">הוספת תמונה לסרט הרץ (הדבק קישור):</span>
+            <div style="display: flex; width: 100%; justify-content: center; gap: 5px;">
+                <input type="text" id="img-url" placeholder="https://example.com/image.jpg">
+                <button onclick="addImage()">הוסף</button>
+            </div>
+            <button onclick="logout()" style="background: transparent; color: #666; font-size: 0.7rem; border: none; margin-top: 5px;">התנתק</button>
         </div>
     </div>
 
     <script>
-        // 1. אתחול Firebase
+        // 1. הגדרות Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBIhLeaQnJ1HMxnEL0S4CLfMNyY7cfEfeA",
             authDomain: "chatunot-b63ec.firebaseapp.com",
@@ -129,119 +117,122 @@
         
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
         let currentCode = localStorage.getItem('weddingCode');
 
         window.onload = () => {
-            createBackground();
-            if (currentCode) {
-                loadWedding(currentCode);
-            }
+            createStars();
+            if (currentCode) loadWedding(currentCode);
         };
 
         async function checkCode() {
-            const codeInput = document.getElementById('login-code');
-            const code = codeInput.value.trim().toUpperCase();
-            if(!code) return alert("נא להזין קוד");
-            
-            try {
-                const doc = await db.collection("weddings").doc(code).get();
-                if (doc.exists) {
-                    localStorage.setItem('weddingCode', code);
-                    location.reload();
-                } else {
-                    alert("הקוד לא נמצא במערכת");
-                }
-            } catch (e) { 
-                console.error("Firebase Error:", e);
-                alert("שגיאת תקשורת"); 
+            const code = document.getElementById('login-code').value.trim().toUpperCase();
+            const doc = await db.collection("weddings").doc(code).get();
+            if (doc.exists) {
+                localStorage.setItem('weddingCode', code);
+                location.reload();
+            } else {
+                alert("קוד לא תקין");
             }
         }
 
-        async function loadWedding(code) {
-            try {
-                const doc = await db.collection("weddings").doc(code).get();
+        function loadWedding(code) {
+            // האזנה בזמן אמת לשינויים ב-Firestore
+            db.collection("weddings").doc(code).onSnapshot(doc => {
                 if(!doc.exists) return;
                 const data = doc.data();
-
+                
                 document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('main-content').style.display = 'flex';
                 document.getElementById('wedding-names').innerText = `${data.groom} & ${data.bride}`;
                 document.getElementById('wedding-date-display').innerText = data.date.split('-').reverse().join(' . ');
 
-                // טעינת תמונות
-                const track = document.getElementById('track');
-                if(data.images && data.images.length > 0) {
-                    track.innerHTML = ""; // ניקוי לפני טעינה
-                    data.images.forEach(url => {
-                        const f = document.createElement('div');
-                        f.className = 'frame';
-                        f.innerHTML = `<img src="${url}">`;
-                        track.appendChild(f);
-                    });
-                    track.innerHTML += track.innerHTML; // הכפלה לאנימציה רציפה
-                }
-
-                startCounter(data.date);
-                updateGreeting();
-            } catch (e) {
-                console.error("Error loading wedding data:", e);
-            }
-        }
-
-        function startCounter(dateStr) {
-            const target = new Date(dateStr + "T19:00:00").getTime();
-            // שיניתי את התאריך בהתאם להודעה שלך על הצעת הנישואין ב-24/02
-            const start = new Date("2026-02-24").getTime(); 
-
-            setInterval(() => {
-                const now = new Date().getTime();
-                const diff = target - now;
+                // עדכון גלריה
+                updateGallery(data.images || []);
                 
-                if (diff > 0) {
-                    document.getElementById('d-val').innerText = Math.floor(diff / 86400000);
-                    document.getElementById('h-val').innerText = Math.floor((diff % 86400000) / 3600000);
-                    document.getElementById('min-val').innerText = Math.floor((diff % 3600000) / 60000);
-                    document.getElementById('sec-val').innerText = Math.floor((diff % 60000) / 1000);
-
-                    const total = target - start;
-                    const progress = Math.min(((now - start) / total * 100), 100).toFixed(4);
-                    document.getElementById('progress-bar').style.width = progress + "%";
-                    document.getElementById('percent-text').innerText = `${progress}% מהציפייה מאחורינו`;
-                } else {
-                    document.getElementById('percent-text').innerText = "היום הגדול הגיע!";
-                    document.getElementById('progress-bar').style.width = "100%";
-                }
-            }, 1000);
+                // התחלת טיימר
+                if(window.timerInterval) clearInterval(window.timerInterval);
+                window.timerInterval = setInterval(() => updateCounter(data.date), 1000);
+            });
         }
 
-        function createBackground() {
-            const layer = document.getElementById('stars-layer');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                const s = (Math.random() * 2 + 1) + 'px';
-                star.style.width = s; star.style.height = s;
-                star.style.top = Math.random() * 100 + '%';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-                layer.appendChild(star);
+        function updateGallery(images) {
+            const track = document.getElementById('track');
+            if (images.length === 0) {
+                track.innerHTML = "<div style='padding:20px;'>טרם נוספו תמונות...</div>";
+                return;
+            }
+            // יצירת סרט רץ כפול בשביל האנימציה
+            const content = images.map(url => `<div class="frame"><img src="${url}"></div>`).join('');
+            track.innerHTML = content + content;
+        }
+
+        async function addImage() {
+            const urlInput = document.getElementById('img-url');
+            const url = urlInput.value.trim();
+            if(!url) return;
+
+            try {
+                await db.collection("weddings").doc(currentCode).update({
+                    images: firebase.firestore.FieldValue.arrayUnion(url)
+                });
+                urlInput.value = "";
+                alert("התמונה נוספה בהצלחה!");
+            } catch (e) {
+                alert("שגיאה בהוספה");
             }
         }
 
-        function updateGreeting() {
-            const hour = new Date().getHours();
-            let text = "יום קסום";
-            if (hour >= 5 && hour < 12) text = "בוקר טוב";
-            else if (hour >= 12 && hour < 17) text = "צהריים טובים";
-            else if (hour >= 17 && hour < 21) text = "ערב טוב";
-            else text = "לילה טוב";
-            document.getElementById('greeting-text').innerText = text;
+        function updateCounter(targetDateStr) {
+            const target = new Date(targetDateStr + "T19:00:00");
+            const now = new Date();
+            const start = new Date("2026-02-24"); // תאריך האירוסין
+
+            const diff = target - now;
+            if (diff <= 0) return;
+
+            // חישוב חודשים וימים
+            let months = (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth());
+            let tempDate = new Date(now);
+            tempDate.setMonth(tempDate.getMonth() + months);
+            
+            if (tempDate > target) {
+                months--;
+                tempDate = new Date(now);
+                tempDate.setMonth(tempDate.getMonth() + months);
+            }
+            
+            const days = Math.floor((target - tempDate) / 86400000);
+            const hours = Math.floor((diff % 86400000) / 3600000);
+            const mins = Math.floor((diff % 3600000) / 60000);
+            const secs = Math.floor((diff % 60000) / 1000);
+
+            document.getElementById('m-val').innerText = months;
+            document.getElementById('d-val').innerText = days;
+            document.getElementById('h-val').innerText = hours;
+            document.getElementById('min-val').innerText = mins;
+            document.getElementById('sec-val').innerText = secs;
+
+            // התקדמות
+            const total = target - start;
+            const elapsed = now - start;
+            const percent = Math.min((elapsed / total) * 100, 100).toFixed(4);
+            document.getElementById('progress-bar').style.width = percent + "%";
+            document.getElementById('percent-text').innerText = `${percent}% מהציפייה מאחורינו`;
+        }
+
+        function createStars() {
+            const layer = document.getElementById('stars-layer');
+            for(let i=0; i<50; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                s.style.width = s.style.height = Math.random()*2 + 'px';
+                s.style.top = Math.random()*100 + '%';
+                s.style.left = Math.random()*100 + '%';
+                layer.appendChild(s);
+            }
         }
 
         function logout() { localStorage.removeItem('weddingCode'); location.reload(); }
-        function openNav() { document.getElementById('side-menu').classList.add('open'); document.getElementById('menu-overlay').style.display='block'; }
-        function closeNav() { document.getElementById('side-menu').classList.remove('open'); document.getElementById('menu-overlay').style.display='none'; }
     </script>
 </body>
 </html>
