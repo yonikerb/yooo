@@ -14,10 +14,11 @@
     <style>
         :root { --gold: #d4af37; --bg: #050505; --glass: rgba(255, 255, 255, 0.05); }
         * { box-sizing: border-box; }
+        
         body {
             font-family: 'Assistant', sans-serif;
             margin: 0; padding: 0; background-color: var(--bg); color: white;
-            overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh;
+            overflow: hidden; display: flex; flex-direction: column; height: 100vh;
         }
 
         /* מסך כניסה */
@@ -28,70 +29,107 @@
         }
         #login-overlay input {
             padding: 15px; border-radius: 10px; border: 1px solid var(--gold);
-            background: #111; color: white; margin: 10px; width: 250px; text-align: center; font-size: 1rem;
+            background: #111; color: white; margin: 10px; width: 250px; text-align: center;
         }
         #login-overlay button {
             padding: 12px 35px; background: var(--gold); border: none; border-radius: 25px;
-            font-weight: bold; cursor: pointer; transition: 0.3s; color: black;
+            font-weight: bold; cursor: pointer; color: black;
         }
 
-        /* סרט פילם */
+        /* סרט פילם (למעלה) */
         .film-strip {
-            width: 100%; background: #000; padding: 20px 0;
-            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            width: 100%; background: #000; padding: 15px 0;
             border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            position: relative; z-index: 5; overflow: hidden;
+            z-index: 5; overflow: hidden;
             -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
         .film-track { display: flex; width: max-content; animation: slide 40s linear infinite; }
-        .frame { width: 220px; height: 150px; margin: 0 10px; flex-shrink: 0; border-radius: 4px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2); }
+        .frame { width: 180px; height: 120px; margin: 0 8px; flex-shrink: 0; border-radius: 4px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.2); }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
         @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* תוכן מרכזי */
-        .main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; }
-        .hebrew-title { font-size: clamp(2.5rem, 10vw, 5rem); color: var(--gold); margin: 10px 0; font-weight: 700; }
+        /* תוכן מרכזי - בדיוק באמצע */
+        .main { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 20px; 
+            z-index: 10;
+        }
+
+        .hebrew-title { 
+            font-size: clamp(3rem, 15vw, 6rem); 
+            color: var(--gold); 
+            margin: 5px 0; 
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
         
         /* מונה זמן */
-        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 25px 0; }
-        .unit { text-align: center; min-width: 70px; padding: 15px 5px; background: var(--glass); border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.1); }
-        .unit .val { font-size: 1.8rem; font-weight: 700; display: block; color: white; }
-        .unit .lbl { font-size: 0.7rem; color: var(--gold); font-weight: bold; }
-
-        /* כפתור העלאה בתחתית */
-        .upload-section { padding: 30px; z-index: 20; text-align: center; background: linear-gradient(transparent, #000); }
-        .upload-btn {
-            background: transparent; border: 1px solid var(--gold); color: var(--gold);
-            padding: 12px 25px; border-radius: 30px; cursor: pointer; font-weight: bold;
-            transition: 0.3s; font-size: 0.9rem;
+        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 30px 0; }
+        .unit { 
+            text-align: center; 
+            min-width: 80px; 
+            padding: 18px 10px; 
+            background: var(--glass); 
+            border-radius: 15px; 
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            backdrop-filter: blur(5px);
         }
-        .upload-btn:hover { background: var(--gold); color: black; box-shadow: 0 0 15px var(--gold); }
-        .upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .unit .val { font-size: 2.2rem; font-weight: 700; display: block; line-height: 1; }
+        .unit .lbl { font-size: 0.8rem; color: var(--gold); margin-top: 5px; }
+
+        /* כפתור העלאה - למטה בצד שמאל */
+        .upload-section {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 100;
+        }
+        .upload-btn {
+            background: var(--bg);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .upload-btn:hover { background: var(--gold); color: black; transform: scale(1.1); }
+        .upload-btn span { display: none; } /* טקסט שיופיע רק במחשב אם תרצה */
 
         #stars-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; animation: twinkle 3s infinite ease-in-out; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
-        <h2 style="color:var(--gold); margin-bottom: 20px;">שלום, הכניסו קוד כניסה</h2>
-        <input type="text" id="login-code" placeholder="הקוד שלכם">
-        <button onclick="checkCode()">כניסה לאתר</button>
+        <h2 style="color:var(--gold)">קוד כניסה</h2>
+        <input type="text" id="login-code" placeholder="הכניסו קוד">
+        <button onclick="checkCode()">כניסה</button>
     </div>
 
     <div id="stars-layer"></div>
 
-    <div id="main-content" style="display:none;">
+    <div id="main-content" style="display:none; height: 100%; display: flex; flex-direction: column;">
         <div class="film-strip">
             <div class="film-track" id="track"></div>
         </div>
 
         <div class="main">
-            <div id="greeting-text" style="color:var(--gold); font-weight: bold; letter-spacing: 2px; margin-bottom: 10px;"></div>
-            <h1 id="wedding-names" class="hebrew-title">טוען שמות...</h1>
-            <div id="wedding-date-display" style="color: rgba(212,175,55,0.7); font-family: 'Playfair Display'; font-size: 1.3rem;"></div>
+            <div id="greeting-text" style="color:var(--gold); font-size: 1.2rem; margin-bottom: 10px;"></div>
+            <h1 id="wedding-names" class="hebrew-title">טוען...</h1>
+            <div id="wedding-date-display" style="color: rgba(212,175,55,0.6); font-family: 'Playfair Display'; font-size: 1.5rem; letter-spacing: 3px;"></div>
             
             <div class="counter-grid">
                 <div class="unit"><span class="val" id="m-val">0</span><span class="lbl">חודשים</span></div>
@@ -101,23 +139,22 @@
                 <div class="unit"><span class="val" id="sec-val">0</span><span class="lbl">שניות</span></div>
             </div>
 
-            <div style="width: 280px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 10px;">
-                <div id="progress-bar" style="height: 100%; width: 0%; background: var(--gold); transition: 0.5s; box-shadow: 0 0 10px var(--gold);"></div>
+            <div style="width: 300px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
+                <div id="progress-bar" style="height: 100%; width: 0%; background: var(--gold); transition: 0.5s;"></div>
             </div>
-            <div id="percent-text" style="font-size: 0.75rem; color: #888; margin-top: 10px;"></div>
+            <div id="percent-text" style="font-size: 0.8rem; color: #666; margin-top: 15px; letter-spacing: 1px;"></div>
         </div>
 
         <div class="upload-section">
-            <button class="upload-btn" id="upload-btn" onclick="document.getElementById('file-input').click()">
-                + הוספת תמונה לגלריה שלכם
+            <button class="upload-btn" onclick="document.getElementById('file-input').click()" title="הוספת תמונה">
+                +
             </button>
             <input type="file" id="file-input" style="display:none" accept="image/*" onchange="uploadToImgBB(this)">
-            <div id="upload-status" style="font-size: 0.8rem; margin-top: 10px; color: var(--gold); min-height: 20px;"></div>
+            <div id="upload-status" style="position: absolute; bottom: 70px; left: 0; width: 200px; font-size: 0.8rem; color: var(--gold);"></div>
         </div>
     </div>
 
     <script>
-        // 1. הגדרות Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBIhLeaQnJ1HMxnEL0S4CLfMNyY7cfEfeA",
             authDomain: "chatunot-b63ec.firebaseapp.com",
@@ -128,8 +165,6 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-
-        // 2. הגדרות ImgBB
         const IMGBB_API_KEY = "f72aea59829f2a6501c518e83e94fe81";
 
         let currentCode = localStorage.getItem('weddingCode');
@@ -139,114 +174,75 @@
             if (currentCode) loadWedding(currentCode);
         };
 
-        // פונקציית כניסה
         async function checkCode() {
             const code = document.getElementById('login-code').value.trim().toUpperCase();
-            if(!code) return alert("נא להזין קוד");
-            
-            try {
-                const doc = await db.collection("weddings").doc(code).get();
-                if (doc.exists) {
-                    localStorage.setItem('weddingCode', code);
-                    location.reload();
-                } else {
-                    alert("הקוד לא קיים במערכת");
-                }
-            } catch (e) { alert("שגיאת תקשורת"); }
+            const doc = await db.collection("weddings").doc(code).get();
+            if (doc.exists) {
+                localStorage.setItem('weddingCode', code);
+                location.reload();
+            } else { alert("קוד שגוי"); }
         }
 
-        // טעינת נתוני החתונה של המשתמש הספציפי
         async function loadWedding(code) {
-            try {
-                const doc = await db.collection("weddings").doc(code).get();
-                if (!doc.exists) return;
-                const data = doc.data();
+            const doc = await db.collection("weddings").doc(code).get();
+            if (!doc.exists) return;
+            const data = doc.data();
 
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-content').style.display = 'flex';
-                document.getElementById('wedding-names').innerText = `${data.groom} & ${data.bride}`;
-                document.getElementById('wedding-date-display').innerText = data.date.split('-').reverse().join(' . ');
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'flex';
+            document.getElementById('wedding-names').innerText = `${data.groom} & ${data.bride}`;
+            document.getElementById('wedding-date-display').innerText = data.date.split('-').reverse().join(' . ');
 
-                // הצגת תמונות בטרק
-                const track = document.getElementById('track');
-                const images = (data.images && data.images.length > 0) ? data.images : ['https://via.placeholder.com/220x150/111/d4af37?text=Add+Your+Photos'];
-                
-                track.innerHTML = "";
-                images.forEach(url => {
-                    const f = document.createElement('div');
-                    f.className = 'frame';
-                    f.innerHTML = `<img src="${url}">`;
-                    track.appendChild(f);
-                });
-                if(images.length > 1) track.innerHTML += track.innerHTML; // הכפלה לאנימציה רציפה
+            const track = document.getElementById('track');
+            const imgs = data.images || [];
+            track.innerHTML = "";
+            (imgs.length > 0 ? imgs : ['https://via.placeholder.com/180x120/111/d4af37?text=Add+Photo']).forEach(url => {
+                track.innerHTML += `<div class="frame"><img src="${url}"></div>`;
+            });
+            if(imgs.length > 1) track.innerHTML += track.innerHTML;
 
-                startCounter(data.date);
-                updateGreeting();
-            } catch (e) { console.error(e); }
+            startCounter(data.date);
+            updateGreeting();
         }
 
-        // העלאה ל-ImgBB ושמירה ב-Firebase של המשתמש
         async function uploadToImgBB(input) {
-            if (!input.files || !input.files[0]) return;
-            
-            const file = input.files[0];
-            const btn = document.getElementById('upload-btn');
+            if (!input.files[0]) return;
             const status = document.getElementById('upload-status');
+            status.innerText = "מעלה...";
             
-            btn.disabled = true;
-            status.innerText = "מעלה תמונה לשרת...";
-
             const formData = new FormData();
-            formData.append("image", file);
+            formData.append("image", input.files[0]);
 
             try {
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-                    method: "POST",
-                    body: formData
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    const imageUrl = result.data.url;
+                const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+                const json = await res.json();
+                if (json.success) {
                     await db.collection("weddings").doc(currentCode).update({
-                        images: firebase.firestore.FieldValue.arrayUnion(imageUrl)
+                        images: firebase.firestore.FieldValue.arrayUnion(json.data.url)
                     });
-                    status.innerText = "התמונה נוספה בהצלחה!";
+                    status.innerText = "הצלחנו!";
                     setTimeout(() => location.reload(), 1000);
                 }
-            } catch (err) {
-                alert("העלאה נכשלה");
-                btn.disabled = false;
-            }
+            } catch (e) { status.innerText = "שגיאה"; }
         }
 
-        // מונה זמן מפורט
-        function startCounter(targetStr) {
-            const target = new Date(targetStr + "T19:00:00").getTime();
+        function startCounter(dateStr) {
+            const target = new Date(dateStr + "T19:00:00").getTime();
             const start = new Date("2026-02-24").getTime(); 
-
-            const interval = setInterval(() => {
+            setInterval(() => {
                 const now = new Date().getTime();
                 const diff = target - now;
-
-                if (diff <= 0) {
-                    clearInterval(interval);
-                    document.getElementById('percent-text').innerText = "היום הגדול הגיע!";
-                    return;
+                if (diff > 0) {
+                    const days = Math.floor(diff / 86400000);
+                    document.getElementById('m-val').innerText = Math.floor(days / 30.44);
+                    document.getElementById('d-val').innerText = Math.floor(days % 30.44);
+                    document.getElementById('h-val').innerText = Math.floor((diff % 86400000) / 3600000);
+                    document.getElementById('min-val').innerText = Math.floor((diff % 3600000) / 60000);
+                    document.getElementById('sec-val').innerText = Math.floor((diff % 60000) / 1000);
+                    const prog = Math.min(((now - start) / (target - start)) * 100, 100).toFixed(4);
+                    document.getElementById('progress-bar').style.width = prog + "%";
+                    document.getElementById('percent-text').innerText = prog + "%";
                 }
-
-                const secTotal = Math.floor(diff / 1000);
-                const daysTotal = Math.floor(secTotal / 86400);
-                
-                document.getElementById('m-val').innerText = Math.floor(daysTotal / 30.44);
-                document.getElementById('d-val').innerText = Math.floor(daysTotal % 30.44);
-                document.getElementById('h-val').innerText = Math.floor((secTotal % 86400) / 3600);
-                document.getElementById('min-val').innerText = Math.floor((secTotal % 3600) / 60);
-                document.getElementById('sec-val').innerText = secTotal % 60;
-
-                const progress = Math.min(((now - start) / (target - start)) * 100, 100).toFixed(4);
-                document.getElementById('progress-bar').style.width = progress + "%";
-                document.getElementById('percent-text').innerText = progress + "% מהציפייה כבר מאחורינו";
             }, 1000);
         }
 
@@ -255,11 +251,9 @@
             for(let i=0; i<100; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                const size = Math.random() * 2 + 'px';
-                star.style.width = size; star.style.height = size;
+                star.style.width = star.style.height = Math.random() * 2 + 'px';
                 star.style.top = Math.random() * 100 + '%';
                 star.style.left = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 5 + 's';
                 container.appendChild(star);
             }
         }
@@ -267,10 +261,7 @@
         function updateGreeting() {
             const h = new Date().getHours();
             let msg = "יום קסום";
-            if(h >= 5 && h < 12) msg = "בוקר טוב";
-            else if(h >= 12 && h < 18) msg = "צהריים טובים";
-            else if(h >= 18 && h < 22) msg = "ערב טוב";
-            else msg = "לילה טוב";
+            if(h<12) msg="בוקר טוב"; else if(h<17) msg="צהריים טובים"; else if(h<21) msg="ערב טוב";
             document.getElementById('greeting-text').innerText = msg;
         }
     </script>
