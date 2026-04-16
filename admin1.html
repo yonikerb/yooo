@@ -3,24 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <title>ניהול מערכת חתונות</title>
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-classic.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-classic.js"></script>
+
     <style>
-        body { background: #111; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px; }
-        input { display: block; margin: 10px; padding: 10px; width: 250px; }
-        button { padding: 10px 20px; background: gold; border: none; cursor: pointer; font-weight: bold; }
+        body { background: #0a0a0a; color: white; font-family: 'Assistant', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px; }
+        .card { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 1px solid #d4af37; box-shadow: 0 0 20px rgba(212,175,55,0.1); }
+        input { display: block; margin: 15px 0; padding: 12px; width: 280px; background: #222; border: 1px solid #444; color: white; border-radius: 8px; text-align: center; }
+        button { width: 100%; padding: 15px; background: #d4af37; border: none; cursor: pointer; font-weight: bold; border-radius: 8px; transition: 0.3s; }
+        button:hover { background: #f1c40f; transform: scale(1.02); }
     </style>
 </head>
 <body>
-    <h1>יצירת זוג חדש במערכת</h1>
-    <input type="text" id="groom" placeholder="שם החתן">
-    <input type="text" id="bride" placeholder="שם הכלה">
-    <input type="date" id="date">
-    <input type="text" id="custom-code" placeholder="קוד כניסה (למשל: YAEL2026)">
-    <button onclick="createNewWedding()">צור חתונה וקוד</button>
+    <div class="card">
+        <h1 style="color:#d4af37; margin-top:0;">יצירת זוג חדש</h1>
+        <input type="text" id="groom" placeholder="שם החתן">
+        <input type="text" id="bride" placeholder="שם הכלה">
+        <input type="date" id="date">
+        <input type="text" id="custom-code" placeholder="קוד כניסה (למשל: 0532490351)">
+        <button id="submit-btn" onclick="createNewWedding()">צור חתונה וקוד</button>
+    </div>
 
     <script>
-        // העתק לכאן את ה-firebaseConfig שלך מהקובץ הקודם
+        // 2. הגדרת ה-Config (המפתחות שלך)
         const firebaseConfig = {
             apiKey: "AIzaSyBIhLeaQnJ1HMxnEL0S4CLfMNyY7cfEfeA",
             authDomain: "chatunot-b63ec.firebaseapp.com",
@@ -29,24 +35,44 @@
             messagingSenderId: "1057494918141",
             appId: "1:1057494918141:web:6d03f8007c894e463a6f94"
         };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
 
+        // 3. אתחול ה-App וה-Database
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(); // עכשיו db מוגדר גלובלית ומוכן לשימוש
+
+        // 4. הפונקציה שתפעל רק בלחיצה
         async function createNewWedding() {
             const groom = document.getElementById('groom').value;
             const bride = document.getElementById('bride').value;
             const date = document.getElementById('date').value;
             const code = document.getElementById('custom-code').value.trim().toUpperCase();
 
-            if(!groom || !bride || !date || !code) return alert("נא למלא הכל");
+            if(!groom || !bride || !date || !code) {
+                return alert("נא למלא את כל השדות");
+            }
+
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "שומר..."; btn.disabled = true;
 
             try {
+                // יצירת המסמך ב-Firestore
                 await db.collection("weddings").doc(code).set({
-                    groom, bride, date, images: []
+                    groom: groom,
+                    bride: bride,
+                    date: date,
+                    images: [] // מערך תמונות ריק בהתחלה
                 });
+                
                 alert("החתונה נוצרה בהצלחה! הקוד הוא: " + code);
+                // ניקוי השדות
+                document.getElementById('groom').value = '';
+                document.getElementById('bride').value = '';
+                document.getElementById('custom-code').value = '';
             } catch(e) {
-                alert("שגיאה: " + e.message);
+                console.error("Error:", e);
+                alert("שגיאה ביצירה: " + e.message);
+            } finally {
+                btn.innerText = "צור חתונה וקוד"; btn.disabled = false;
             }
         }
     </script>
