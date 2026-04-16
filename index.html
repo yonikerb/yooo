@@ -20,49 +20,6 @@
             overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh;
         }
 
-        /* תפריט צד */
-        #side-menu {
-            position: fixed; top: 0; right: -280px; width: 280px; height: 100%;
-            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px);
-            z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 1px solid var(--gold); padding: 40px 25px;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.8);
-        }
-        #side-menu.open { right: 0; }
-        #menu-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); display: none; z-index: 1999;
-        }
-        .menu-link {
-            display: block; color: white; text-decoration: none; font-size: 1.4rem;
-            margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-            transition: 0.3s;
-        }
-
-        #stars-layer { position: fixed; top: -50px; left: -50px; width: calc(100% + 100px); height: calc(100% + 100px); z-index: 1; pointer-events: none; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: twinkle var(--duration) infinite ease-in-out; }
-        
-        @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: 0.5; } }
-
-        .film-strip {
-            width: 100%; background: #000; padding: 25px 0;
-            border-top: 1px solid rgba(212, 175, 55, 0.3); border-bottom: 1px solid rgba(212, 175, 55, 0.3);
-            position: relative; z-index: 5; overflow: hidden;
-        }
-        .film-track { display: flex; width: max-content; animation: slide linear infinite; padding: 15px 0; }
-        .frame { width: 260px; height: 170px; margin: 0 10px; flex-shrink: 0; border-radius: 2px; overflow: hidden; }
-        .frame img { width: 100%; height: 100%; object-fit: cover; }
-        @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        .main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; }
-        .hebrew-title { font-size: clamp(2.8rem, 12vw, 5.5rem); color: var(--gold); margin: 0; font-weight: 700; }
-        .english-sub { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: rgba(212, 175, 55, 0.6); }
-
-        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 35px 0; }
-        .unit { text-align: center; min-width: 85px; padding: 20px 10px; background: var(--glass); border-radius: 15px; border: 1px solid rgba(212, 175, 55, 0.1); }
-        .unit .val { font-size: 2.5rem; font-weight: 700; display: block; }
-        .unit .lbl { font-size: 0.7rem; color: var(--gold); }
-
         /* מסך כניסה */
         #login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -75,8 +32,43 @@
         }
         #login-overlay button {
             padding: 12px 30px; background: var(--gold); border: none; border-radius: 25px;
-            font-weight: bold; cursor: pointer;
+            font-weight: bold; cursor: pointer; transition: 0.3s;
         }
+
+        /* תפריט צד */
+        #side-menu {
+            position: fixed; top: 0; right: -280px; width: 280px; height: 100%;
+            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(15px);
+            z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 1px solid var(--gold); padding: 40px 25px;
+        }
+        #side-menu.open { right: 0; }
+        #menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; z-index: 1999; }
+        .menu-link { display: block; color: white; text-decoration: none; font-size: 1.4rem; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid rgba(212, 175, 55, 0.1); }
+
+        #stars-layer { position: fixed; top: -50px; left: -50px; width: calc(100% + 100px); height: calc(100% + 100px); z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: twinkle var(--duration) infinite ease-in-out; }
+        
+        .film-strip {
+            width: 100%; background: #000; padding: 25px 0; border-top: 1px solid rgba(212, 175, 55, 0.3);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3); position: relative; z-index: 5; overflow: hidden;
+        }
+        .film-track { display: flex; width: max-content; animation: slide 60s linear infinite; }
+        .frame { width: 260px; height: 170px; margin: 0 10px; flex-shrink: 0; border-radius: 2px; overflow: hidden; }
+        .frame img { width: 100%; height: 100%; object-fit: cover; }
+        @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        .main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; }
+        .hebrew-title { font-size: clamp(2.8rem, 12vw, 5.5rem); color: var(--gold); margin: 0; font-weight: 700; }
+        .english-sub { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: rgba(212, 175, 55, 0.6); margin-top: 5px; }
+
+        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 35px 0; }
+        .unit { text-align: center; min-width: 85px; padding: 20px 10px; background: var(--glass); border-radius: 15px; border: 1px solid rgba(212, 175, 55, 0.1); }
+        .unit .val { font-size: 2.5rem; font-weight: 700; display: block; }
+        .unit .lbl { font-size: 0.7rem; color: var(--gold); }
+
+        .progress-container { width: 300px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 20px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background: var(--gold); transition: 0.5s; }
     </style>
 </head>
 <body>
@@ -87,24 +79,22 @@
         <button onclick="checkCode()">כניסה</button>
     </div>
 
-    <div id="menu-overlay"></div>
+    <div id="menu-overlay" onclick="closeNav()"></div>
     <div id="side-menu">
         <nav>
             <a href="#" class="menu-link" onclick="closeNav()">דף הבית</a>
-            <a href="#" class="menu-link" onclick="logout()">יציאה</a>
+            <a href="#" class="menu-link" onclick="logout()">החלף משתמש / יציאה</a>
         </nav>
     </div>
 
     <div id="stars-layer"></div>
 
     <div id="main-content" style="display:none;">
-        <div class="film-strip">
-            <div class="film-track" id="track"></div>
-        </div>
+        <div class="film-strip"><div class="film-track" id="track"></div></div>
 
         <div class="main">
             <div id="greeting-text" style="color:var(--gold); font-weight:bold; margin-bottom:10px;"></div>
-            <h1 id="groom-bride-names" class="hebrew-title">טוען...</h1>
+            <h1 id="wedding-names" class="hebrew-title">טוען...</h1>
             <div id="wedding-date-display" class="english-sub"></div>
             
             <div class="counter-grid">
@@ -113,11 +103,14 @@
                 <div class="unit"><span class="val" id="min-val">0</span><span class="lbl">דקות</span></div>
                 <div class="unit"><span class="val" id="sec-val">0</span><span class="lbl">שניות</span></div>
             </div>
+
+            <div class="progress-container"><div id="progress-bar"></div></div>
+            <div id="percent-text" style="font-size: 0.8rem; color: #888; margin-top: 10px;"></div>
         </div>
     </div>
 
     <script>
-        // 1. אתחול Firebase קודם כל
+        // 1. אתחול Firebase - פותר את שגיאת ה-ReferenceError
         const firebaseConfig = {
             apiKey: "AIzaSyBIhLeaQnJ1HMxnEL0S4CLfMNyY7cfEfeA",
             authDomain: "chatunot-b63ec.firebaseapp.com",
@@ -129,36 +122,41 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        let currentWeddingCode = localStorage.getItem('weddingCode');
+        let currentCode = localStorage.getItem('weddingCode');
 
         window.onload = () => {
             createBackground();
-            if (currentWeddingCode) {
-                loadWedding(currentWeddingCode);
+            if (currentCode) {
+                loadWedding(currentCode);
             }
         };
 
         async function checkCode() {
             const code = document.getElementById('login-code').value.trim().toUpperCase();
-            const doc = await db.collection("weddings").doc(code).get();
-            if (doc.exists) {
-                localStorage.setItem('weddingCode', code);
-                location.reload();
-            } else {
-                alert("קוד לא נמצא");
-            }
+            if(!code) return alert("נא להזין קוד");
+            
+            try {
+                const doc = await db.collection("weddings").doc(code).get();
+                if (doc.exists) {
+                    localStorage.setItem('weddingCode', code);
+                    location.reload();
+                } else {
+                    alert("הקוד לא נמצא במערכת");
+                }
+            } catch (e) { alert("שגיאת תקשורת"); }
         }
 
         async function loadWedding(code) {
             const doc = await db.collection("weddings").doc(code).get();
+            if(!doc.exists) return;
             const data = doc.data();
-            
+
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
-            document.getElementById('groom-bride-names').innerText = `${data.groom} & ${data.bride}`;
+            document.getElementById('wedding-names').innerText = `${data.groom} & ${data.bride}`;
             document.getElementById('wedding-date-display').innerText = data.date.split('-').reverse().join(' . ');
 
-            // טעינת תמונות ל-Film Strip
+            // טעינת תמונות
             const track = document.getElementById('track');
             if(data.images && data.images.length > 0) {
                 data.images.forEach(url => {
@@ -167,9 +165,7 @@
                     f.innerHTML = `<img src="${url}">`;
                     track.appendChild(f);
                 });
-                // הכפלה לאנימציה חלקה
-                track.innerHTML += track.innerHTML;
-                track.style.animationDuration = (data.images.length * 5) + 's';
+                track.innerHTML += track.innerHTML; // הכפלה לאנימציה
             }
 
             startCounter(data.date);
@@ -177,27 +173,25 @@
         }
 
         function startCounter(dateStr) {
-            const target = new Date(dateStr + "T19:30:00").getTime();
+            const target = new Date(dateStr + "T19:00:00").getTime();
+            const start = new Date("2026-02-22").getTime(); // תאריך ההתחלה שלך
+
             setInterval(() => {
                 const now = new Date().getTime();
                 const diff = target - now;
+                
                 if (diff > 0) {
                     document.getElementById('d-val').innerText = Math.floor(diff / 86400000);
                     document.getElementById('h-val').innerText = Math.floor((diff % 86400000) / 3600000);
                     document.getElementById('min-val').innerText = Math.floor((diff % 3600000) / 60000);
                     document.getElementById('sec-val').innerText = Math.floor((diff % 60000) / 1000);
+
+                    const total = target - start;
+                    const progress = ((now - start) / total * 100).toFixed(4);
+                    document.getElementById('progress-bar').style.width = progress + "%";
+                    document.getElementById('percent-text').innerText = `${progress}% מהציפייה מאחורינו`;
                 }
             }, 1000);
-        }
-
-        function updateGreeting() {
-            const hour = new Date().getHours();
-            let text = "יום קסום";
-            if (hour >= 5 && hour < 12) text = "בוקר טוב";
-            else if (hour >= 12 && hour < 17) text = "צהריים טובים";
-            else if (hour >= 17 && hour < 21) text = "ערב טוב";
-            else text = "לילה טוב";
-            document.getElementById('greeting-text').innerText = text;
         }
 
         function createBackground() {
@@ -214,10 +208,19 @@
             }
         }
 
-        function logout() {
-            localStorage.removeItem('weddingCode');
-            location.reload();
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let text = "יום קסום";
+            if (hour >= 5 && hour < 12) text = "בוקר טוב";
+            else if (hour >= 12 && hour < 17) text = "צהריים טובים";
+            else if (hour >= 17 && hour < 21) text = "ערב טוב";
+            else text = "לילה טוב";
+            document.getElementById('greeting-text').innerText = text;
         }
+
+        function logout() { localStorage.removeItem('weddingCode'); location.reload(); }
+        function openNav() { document.getElementById('side-menu').classList.add('open'); document.getElementById('menu-overlay').style.display='block'; }
+        function closeNav() { document.getElementById('side-menu').classList.remove('open'); document.getElementById('menu-overlay').style.display='none'; }
     </script>
 </body>
 </html>
