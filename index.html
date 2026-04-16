@@ -4,7 +4,7 @@
     <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>החתונה שלנו</title>
+    <title>חתונה</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
@@ -13,12 +13,12 @@
 
     <style>
         :root { --gold: #d4af37; --bg: #050505; --glass: rgba(255, 255, 255, 0.05); }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; }
         
         body {
             font-family: 'Assistant', sans-serif;
             margin: 0; padding: 0; background-color: var(--bg); color: white;
-            overflow: hidden; display: flex; flex-direction: column; height: 100vh;
+            overflow-x: hidden; display: flex; flex-direction: column; min-height: 100vh;
         }
 
         /* מסך כניסה */
@@ -29,145 +29,80 @@
         }
         #login-overlay input {
             padding: 15px; border-radius: 12px; border: 1px solid var(--gold);
-            background: #111; color: white; margin: 10px; width: 100%; max-width: 280px; text-align: center; font-size: 1rem;
+            background: #111; color: white; margin: 10px; width: 250px; text-align: center;
         }
         #login-overlay button {
-            padding: 12px 40px; background: var(--gold); border: none; border-radius: 30px;
-            font-weight: bold; cursor: pointer; color: black; font-size: 1.1rem;
+            padding: 12px 35px; background: var(--gold); border: none; border-radius: 25px;
+            font-weight: bold; cursor: pointer; color: black;
         }
 
-        /* סרט פילם משופר */
+        /* סרט פילם - אותנטי ועם לופ אינסופי */
         .film-strip {
-            width: 100%; background: #000; padding: 25px 0;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            z-index: 5; overflow: hidden;
-            position: relative;
-            /* אפקט עמעום בצדדים */
-            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+            width: 100%; background: #000; padding: 30px 0;
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            position: relative; z-index: 5; overflow: hidden;
+            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
-        .film-track { 
-            display: flex; 
-            width: max-content; 
-            animation: slide 30s linear infinite; 
-            will-change: transform;
+        
+        /* שכבת החורים (פילם) המטושטשת */
+        .film-strip::before, .film-strip::after {
+            content: ""; position: absolute; left: 0; width: 100%; height: 15px;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.7) 20%, transparent 60%);
+            background-size: 30px 100%; z-index: 10; pointer-events: none; filter: blur(1px);
         }
-        .frame { 
-            width: 260px; /* תמונות גדולות יותר */
-            height: 180px; 
-            margin: 0 12px; 
-            flex-shrink: 0; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
+        .film-strip::before { top: 5px; } .film-strip::after { bottom: 5px; }
+
+        .film-track { display: flex; width: max-content; animation: slide linear infinite; }
+        .frame { width: 220px; height: 150px; margin: 0 10px; flex-shrink: 0; border-radius: 2px; overflow: hidden; }
         .frame img { width: 100%; height: 100%; object-fit: cover; }
-        
-        @keyframes slide { 
-            0% { transform: translateX(0); } 
-            100% { transform: translateX(-50%); } 
-        }
+        @keyframes slide { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        /* תוכן מרכזי רספונסיבי */
-        .main { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center; 
-            padding: 20px; 
-            z-index: 10;
-        }
+        /* תוכן מרכזי */
+        .main { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; z-index: 10; }
+        .hebrew-title { font-size: clamp(2.8rem, 12vw, 5.5rem); color: var(--gold); margin: 0; font-weight: 700; }
+        .english-sub { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: rgba(212, 175, 55, 0.6); margin-top: 5px; }
 
-        .hebrew-title { 
-            font-size: clamp(2.8rem, 12vw, 5.5rem); 
-            color: var(--gold); 
-            margin: 10px 0; 
-            font-weight: 700;
-            line-height: 1.1;
-        }
-        
-        /* מונה זמן מותאם לנייד */
-        .counter-grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 10px; 
-            margin: 20px 0; 
-            width: 100%; 
-            max-width: 450px;
-        }
-        /* בחמישי ובשישי (אם יש) נרצה שיתפרסו יפה */
-        .counter-grid div:nth-child(4), .counter-grid div:nth-child(5) {
-            grid-column: span 1.5;
-        }
+        /* מונה זמן מסודר */
+        .counter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin: 35px 0; }
+        .unit { text-align: center; min-width: 85px; padding: 20px 10px; background: var(--glass); border-radius: 15px; border: 1px solid rgba(212, 175, 55, 0.1); }
+        .unit .val { font-size: 2.5rem; font-weight: 700; display: block; }
+        .unit .lbl { font-size: 0.7rem; color: var(--gold); }
 
-        .unit { 
-            text-align: center; 
-            padding: 15px 5px; 
-            background: var(--glass); 
-            border-radius: 12px; 
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            backdrop-filter: blur(10px);
-        }
-        .unit .val { font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: 700; display: block; color: #fff; }
-        .unit .lbl { font-size: 0.75rem; color: var(--gold); font-weight: bold; text-transform: uppercase; }
-
-        /* כפתור העלאה צף - סמארטפון סטייל */
-        .upload-section {
-            position: fixed;
-            bottom: 25px;
-            left: 25px;
-            z-index: 100;
-        }
+        /* כפתור העלאה צף למטה בצד שמאל */
+        .upload-section { position: fixed; bottom: 30px; left: 30px; z-index: 100; }
         .upload-btn {
-            background: var(--gold);
-            border: none;
-            color: black;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-            transition: 0.3s active;
+            background: transparent; border: 1px solid var(--gold); color: var(--gold);
+            width: 60px; height: 60px; border-radius: 50%;
+            cursor: pointer; font-size: 2rem; display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
         }
-        .upload-btn:active { transform: scale(0.9); }
+        .upload-btn:hover { background: var(--gold); color: black; }
 
-        #stars-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-        .star { position: absolute; background: white; border-radius: 50%; opacity: 0.4; }
-
-        /* התאמות ספציפיות למסכים קטנים מאוד */
-        @media (max-width: 380px) {
-            .frame { width: 200px; height: 140px; }
-            .counter-grid { grid-template-columns: repeat(2, 1fr); }
-            .counter-grid div:nth-child(5) { grid-column: span 2; }
-        }
+        #stars-layer { position: fixed; top: -50px; left: -50px; width: calc(100% + 100px); height: calc(100% + 100px); z-index: 1; pointer-events: none; }
+        .star { position: absolute; background: white; border-radius: 50%; opacity: 0; animation: twinkle var(--duration) infinite ease-in-out; }
+        
+        @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
-        <h2 style="color:var(--gold); font-family: 'Playfair Display';">The Wedding</h2>
-        <input type="text" id="login-code" placeholder="הקוד שלכם">
+        <h2 style="color:var(--gold)">ברוכים הבאים</h2>
+        <input type="text" id="login-code" placeholder="הכניסו קוד כניסה">
         <button onclick="checkCode()">כניסה</button>
     </div>
 
     <div id="stars-layer"></div>
 
-    <div id="main-content" style="display:none; height: 100%; flex-direction: column;">
-        <div class="film-strip">
-            <div class="film-track" id="track"></div>
-        </div>
+    <div id="main-content" style="display:none;">
+        <div class="film-strip"><div class="film-track" id="track"></div></div>
 
         <div class="main">
-            <div id="greeting-text" style="color:var(--gold); font-size: 1rem; letter-spacing: 2px;"></div>
-            <h1 id="wedding-names" class="hebrew-title">...</h1>
-            <div id="wedding-date-display" style="color: rgba(255,255,255,0.5); font-size: 1.2rem; margin-bottom: 10px;"></div>
+            <div id="greeting-text" style="color:var(--gold); font-weight:bold; margin-bottom:10px;"></div>
+            <h1 id="wedding-names" class="hebrew-title">טוען...</h1>
+            <div id="wedding-date-display" class="english-sub"></div>
             
             <div class="counter-grid">
                 <div class="unit"><span class="val" id="m-val">0</span><span class="lbl">חודשים</span></div>
@@ -176,17 +111,12 @@
                 <div class="unit"><span class="val" id="min-val">0</span><span class="lbl">דקות</span></div>
                 <div class="unit"><span class="val" id="sec-val">0</span><span class="lbl">שניות</span></div>
             </div>
-
-            <div style="width: 80%; max-width: 300px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden;">
-                <div id="progress-bar" style="height: 100%; width: 0%; background: var(--gold); transition: 0.5s;"></div>
-            </div>
-            <div id="percent-text" style="font-size: 0.7rem; color: #555; margin-top: 10px;"></div>
         </div>
 
         <div class="upload-section">
             <button class="upload-btn" onclick="document.getElementById('file-input').click()">+</button>
             <input type="file" id="file-input" style="display:none" accept="image/*" onchange="uploadToImgBB(this)">
-            <div id="upload-status" style="position: absolute; bottom: 70px; left: 0; width: 150px; font-size: 0.7rem; color: var(--gold); font-weight: bold;"></div>
+            <div id="upload-status" style="position: absolute; bottom: 70px; left: 0; width: 200px; font-size: 0.8rem; color: var(--gold);"></div>
         </div>
     </div>
 
@@ -206,8 +136,10 @@
         let currentCode = localStorage.getItem('weddingCode');
 
         window.onload = () => {
-            createStars();
-            if (currentCode) loadWedding(currentCode);
+            createBackground();
+            if (currentCode) {
+                loadWedding(currentCode);
+            }
         };
 
         async function checkCode() {
@@ -216,31 +148,29 @@
             if (doc.exists) {
                 localStorage.setItem('weddingCode', code);
                 location.reload();
-            } else { alert("הקוד שהזנת אינו תקין"); }
+            } else {
+                alert("קוד לא נמצא");
+            }
         }
 
         async function loadWedding(code) {
             const doc = await db.collection("weddings").doc(code).get();
-            if (!doc.exists) return;
             const data = doc.data();
-
+            
             document.getElementById('login-overlay').style.display = 'none';
-            document.getElementById('main-content').style.display = 'flex';
+            document.getElementById('main-content').style.display = 'block';
             document.getElementById('wedding-names').innerText = `${data.groom} & ${data.bride}`;
-            document.getElementById('wedding-date-display').innerText = data.date.split('-').reverse().join(' / ');
+            document.getElementById('wedding-date-display').innerText = data.date.split('-').reverse().join(' . ');
 
+            // לוגיקה ללופ תמונות אינסופי
             const track = document.getElementById('track');
-            let imgs = data.images || [];
+            const imgs = data.images || [];
             
-            // תמונת ברירת מחדל אם אין תמונות
-            if(imgs.length === 0) imgs = ['https://via.placeholder.com/400x300/111/d4af37?text=Your+Photo+Here'];
-            
-            // יצירת הלופ האינסופי - משכפלים את התמונות עד שיש מספיק רוחב
             track.innerHTML = "";
-            const totalToDisplay = [...imgs, ...imgs, ...imgs, ...imgs]; // משכפלים 4 פעמים לביטחון
-            totalToDisplay.forEach(url => {
+            (imgs.length > 0 ? imgs : ['https://via.placeholder.com/220x150/111/d4af37?text=Add+Photo']).forEach(url => {
                 track.innerHTML += `<div class="frame"><img src="${url}"></div>`;
             });
+            if(imgs.length > 1) track.innerHTML += track.innerHTML; // הכפלה לאנימציה רציפה
 
             startCounter(data.date);
             updateGreeting();
@@ -249,7 +179,7 @@
         async function uploadToImgBB(input) {
             if (!input.files[0]) return;
             const status = document.getElementById('upload-status');
-            status.innerText = "מעלה רגע קסום...";
+            status.innerText = "מעלה...";
             
             const formData = new FormData();
             formData.append("image", input.files[0]);
@@ -262,19 +192,17 @@
                         images: firebase.firestore.FieldValue.arrayUnion(json.data.url)
                     });
                     status.innerText = "הצלחנו!";
-                    setTimeout(() => location.reload(), 800);
+                    setTimeout(() => location.reload(), 1000);
                 }
-            } catch (e) { status.innerText = "תקלה בהעלאה"; }
+            } catch (e) { status.innerText = "שגיאה"; }
         }
 
         function startCounter(dateStr) {
-            const target = new Date(dateStr + "T19:30:00").getTime();
+            const target = new Date(dateStr + "T19:00:00").getTime();
             const start = new Date("2026-02-24").getTime(); 
-            
             setInterval(() => {
                 const now = new Date().getTime();
                 const diff = target - now;
-                
                 if (diff > 0) {
                     const days = Math.floor(diff / 86400000);
                     document.getElementById('m-val').innerText = Math.floor(days / 30.44);
@@ -282,32 +210,28 @@
                     document.getElementById('h-val').innerText = Math.floor((diff % 86400000) / 3600000);
                     document.getElementById('min-val').innerText = Math.floor((diff % 3600000) / 60000);
                     document.getElementById('sec-val').innerText = Math.floor((diff % 60000) / 1000);
-                    
-                    const prog = Math.min(((now - start) / (target - start)) * 100, 100).toFixed(4);
-                    document.getElementById('progress-bar').style.width = prog + "%";
-                    document.getElementById('percent-text').innerText = prog + "% מהדרך עברה";
                 }
             }, 1000);
         }
 
-        function createStars() {
-            const container = document.getElementById('stars-layer');
-            for(let i=0; i<80; i++) {
+        function createBackground() {
+            const layer = document.getElementById('stars-layer');
+            for (let i = 0; i < 100; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
-                const size = Math.random() * 2 + 'px';
-                star.style.width = star.style.height = size;
+                const s = Math.random() * 2 + 'px';
+                star.style.width = s; star.style.height = s;
                 star.style.top = Math.random() * 100 + '%';
                 star.style.left = Math.random() * 100 + '%';
-                star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite`;
-                container.appendChild(star);
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                layer.appendChild(star);
             }
         }
 
         function updateGreeting() {
             const h = new Date().getHours();
             let msg = "יום קסום";
-            if(h<12) msg="בוקר אור"; else if(h<17) msg="צהריים טובים"; else if(h<21) msg="ערב נפלא";
+            if(h<12) msg="בוקר טוב"; else if(h<17) msg="צהריים טובים"; else if(h<21) msg="ערב טוב";
             document.getElementById('greeting-text').innerText = msg;
         }
     </script>
