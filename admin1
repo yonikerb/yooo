@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ניהול מערכת חתונות</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-classic.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-classic.js"></script>
+    <style>
+        body { background: #111; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px; }
+        input { display: block; margin: 10px; padding: 10px; width: 250px; }
+        button { padding: 10px 20px; background: gold; border: none; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>יצירת זוג חדש במערכת</h1>
+    <input type="text" id="groom" placeholder="שם החתן">
+    <input type="text" id="bride" placeholder="שם הכלה">
+    <input type="date" id="date">
+    <input type="text" id="custom-code" placeholder="קוד כניסה (למשל: YAEL2026)">
+    <button onclick="createNewWedding()">צור חתונה וקוד</button>
+
+    <script>
+        // העתק לכאן את ה-firebaseConfig שלך מהקובץ הקודם
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIhLeaQnJ1HMxnEL0S4CLfMNyY7cfEfeA",
+            authDomain: "chatunot-b63ec.firebaseapp.com",
+            projectId: "chatunot-b63ec",
+            storageBucket: "chatunot-b63ec.firebasestorage.app",
+            messagingSenderId: "1057494918141",
+            appId: "1:1057494918141:web:6d03f8007c894e463a6f94"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function createNewWedding() {
+            const groom = document.getElementById('groom').value;
+            const bride = document.getElementById('bride').value;
+            const date = document.getElementById('date').value;
+            const code = document.getElementById('custom-code').value.trim().toUpperCase();
+
+            if(!groom || !bride || !date || !code) return alert("נא למלא הכל");
+
+            try {
+                await db.collection("weddings").doc(code).set({
+                    groom, bride, date, images: []
+                });
+                alert("החתונה נוצרה בהצלחה! הקוד הוא: " + code);
+            } catch(e) {
+                alert("שגיאה: " + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
